@@ -11,14 +11,15 @@ This starter kit uses the following tech stack:
    - **Clerk**: Implemented via `@clerk/nextjs` for handling authentication and user management
 
 3. **Database and Backend:**
-   - **Supabase**: Used as the main database and backend service
-   - Database schema includes tables for:
-     - customers
-     - products
-     - prices
-     - subscriptions
+   - **Supabase**: Used as the main database and backend service once the client decides to scale
+   <!-- - Database schema includes tables for:
+     - users
+     - questions
+     - answers
+     - prices and quotes
+     
    - Row Level Security (RLS) is enabled for data protection
-   - Custom types for handling pricing plans and subscription statuses
+   - Custom types for handling pricing plans and subscription statuses -->
 
 4. **UI Components and Styling:**
    - **shadcn/ui**: Beautifully designed components made with Tailwind CSS and Radix UI
@@ -59,8 +60,12 @@ This starter kit uses the following tech stack:
    - **vaul**: For additional UI components
    - **cmdk**: For command palette functionality
 
+10. **Testing and Monitoring**
+   - **cypress**: For end-to-end testing
+   - **sentry**: detailed monitoring
+  
+
 The project is set up as a modern SaaS application with:
-- Full subscription management system
 - Secure authentication
 - Type-safe development
 - Modern UI components

@@ -3,4 +3,9 @@ description: Project documentation rules
 globs: 
 alwaysApply: true
 ---
-Always refer to @project_requirement_document.md for the project requirements and @app_flow_document.md for the flow of the app. Unless the user says otherwise or has defined new requirements or additional flow.
+Always refer to @project_requirement_document.md for the project requirements and @app_flow_document.md for the flow of the app. 
+ALways refer to [frontend_guidelines.md](mdc:documentation/frontend_guidelines.md) for styling details and UI best practices.
+Always refer to [starter_tech_stack_document.md](mdc:documentation/starter_tech_stack_document.md) for the tech stack we will use and do not deviate from it.
+Make sure the [implementation.md](mdc:documentation/implementation.md) is followed as described and to not jump to the next step automatically. The manager / builder of this project will always review the code you created or generate the components itself.
+
+Unless the user says otherwise or has defined new requirements or additional flow.

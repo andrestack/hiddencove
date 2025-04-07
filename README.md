@@ -1,9 +1,6 @@
-[![CodeGuide](/codeguide-backdrop.svg)](https://codeguide.dev)
+# Hidden Cove Onboarding Software
 
-
-# CodeGuide Starter Lite
-
-A modern web application starter template built with Next.js 14, featuring authentication, database integration.
+A modern web based custom onboarding application for Hidden Cove, a expert coloring hair salong in Noosa. This smart consultation an quoting tool with enhanced AI capabilites will guide stylists through a series of questions providing real-time insights based on user responses and it will also include images and visual aids to create and engaging and intuitive UX.
 
 ## Tech Stack
 
@@ -21,42 +18,8 @@ Before you begin, ensure you have the following:
 - A [Supabase](https://supabase.com/) account for database
 - Generated project documents from [CodeGuide](https://codeguide.dev/) for best development experience
 
-## Getting Started
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd codeguide-starter-lite
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   # or
-   yarn install
-   # or
-   pnpm install
-   ```
-
-3. **Environment Variables Setup**
-   - Copy the `.env.example` file to `.env`:
-     ```bash
-     cp .env.example .env
-     ```
-   - Fill in the environment variables in `.env` (see Configuration section below)
-
-4. **Start the development server**
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   # or
-   pnpm dev
-   ```
-
-5. **Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.**
-
-## Configuration
+<!-- ## Configuration
 
 ### Clerk Setup
 1. Go to [Clerk Dashboard](https://dashboard.clerk.com/)
@@ -130,4 +93,4 @@ To implement the generated documentation from CodeGuide:
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. -->

@@ -26,6 +26,7 @@ globs: **/*.{tsx,jsx}
 - Implement proper state management using Context API or external libraries
 - Utilize memoization techniques like `useMemo` and `useCallback` for performance
 - Follow the single responsibility principle for components
+- Always respect and implement SOLID principles when designing and introducint new components
 
 ---
 name: typescript-best-practices.mdc
