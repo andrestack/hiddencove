@@ -4,20 +4,19 @@
 
 ### 1 Purpose of this Document
 
-This document outlines the requirements for developing an Progressive Web Application with AI-enhanced “Smart Consultation and Quoting Tool.” It captures the objectives, user needs, and functionalities required to streamline stylists’ consultations, reduce the time spent on them, and ensure brand consistency through AI-driven insights.
+This document outlines the requirements for developing a Progressive Web Application with AI-enhanced insights. It captures the objectives, user needs, and functionalities required to streamline stylists’ consultations, reduce the time spent on them, and ensure brand consistency through AI-driven insights.
 
 ### 1.2 Background
 
-- **Context**: Stylists often need to perform consultations, gather client information, and provide quotes. This process can be time-consuming and prone to inconsistencies.
-- **Opportunity**: Integrating AI (ChatGPT-4) can offer on-the-fly suggestions and brand-consistent guidance, enhancing customer experience and reducing the manual workload.
+- **Context**: Stylists often need to perform consultations, gather client's preferences, explain pros and cons, and provide quotes. This process can be time-consuming and prone to inconsistencies.
+- **Opportunity**: Integrating a tool with AI and an easy to complete quote generation can offer on-the-fly suggestions and brand-consistent guidance, enhancing customer experience and reducing the manual workload.
 
 ### 1.3 Scope
 
 - **In Scope**:
-    - A guided consultation flow with multiple-choice questions
+    - A guided consultation flow with a list of questions aimed at covering all aspects of the styling job ahead
     - Real-time AI-driven suggestions
-    - Integration of provided images/visual aids
-    - Basic quoting functionality or output (as needed by the product)
+    - Basic quoting functionality or output (as needed by the product) based on existing price lists and done on the final step via stylist input
 - **Out of Scope** (examples):
     - Payment processing
     - Detailed CRM or inventory management
@@ -27,7 +26,7 @@ This document outlines the requirements for developing an Progressive Web Applic
 
 ## 2. Product Overview
 
-We will develop a **smart consultation and quoting tool** enhanced with AI capabilities (ChatGPT-4 and aboce). The system will guide stylists through a series of questions, providing real-time insights based on user responses. It will also include images and visual aids to create an engaging and intuitive user experience.
+We will develop a **smart consultation and quoting tool** enhanced with AI capabilities (ChatGPT-4 and aboce). The system will guide stylists through a series of questions, also providing real-time insights. It will also include simple user authentication. While we will not display the 
 
 ---
 
@@ -62,28 +61,28 @@ We will develop a **smart consultation and quoting tool** enhanced with AI capab
 1. **Guided Consultation Start**
     - *Trigger*: Stylist initiates a new consultation.
     - *Flow*: The system presents a step-by-step questionnaire.
-    - *Outcome*: A structured set of questions and responses ready for AI analysis.
+    - *Outcome*: A structured set of questions ready for AI analysis.
 2. **AI-Assisted Recommendations**
-    - *Triggers*: The users swipes to a question card or selects a response or provides text.
-    - *Flow*: ChatGPT-4 reads the question at hand and then the user responses and knowledge base content, then generates suggestions or clarifications for the stylist.
+    - *Triggers*: The users swipes to a question card 
+    - *Flow*: ChatGPT-4 reads the question at hand and generates suggestions or clarifications for the stylist.
     - *Outcome*: Stylist sees brand-consistent options or recommendations to guide the client.
-3. **Visual Aids Integration**
+<!-- 3. **Visual Aids Integration**
     - *Trigger*: User arrives at a step with an associated image (e.g., style references, product visuals).
     - *Flow*: The system loads the relevant image to guide the conversation.
-    - *Outcome*: Stylist and client can view images in a mobile-responsive layout.
+    - *Outcome*: Stylist and client can view images in a mobile-responsive layout. -->
 4. **Quotation Output**
-    - *Trigger*: Stylist completes consultation questions.
-    - *Flow*: System calculates or suggests a quote based on inputs and brand guidelines.
+    - *Trigger*: Stylist completes consultation questions and starts adding the products he/she sees relevant
+    - *Flow*: System calculates or suggests a quote based on an existing pricing list
     - *Outcome*: Final consultation summary with a suggested quote is displayed or can be shared.
 
 ### 5.2 User Stories (Examples)
 
 1. **Stylist starts consultation**
-    - “As a stylist, I want a step-by-step question flow so that I can easily capture all necessary client details.”
+    - “As a stylist, I want a thorough step-by-step question flow so that I can easily capture all necessary client details.”
 2. **Stylist needs AI assistance**
     - “As a stylist, I want AI-generated suggestions so that I can provide personalized recommendations without guesswork.”
-3. **Stylist wants to show visual aids**
-    - “As a stylist, I want to display relevant images for each step so that clients can visualize style options.”
+<!-- 3. **Stylist wants to show visual aids**
+    - “As a stylist, I want to display relevant images for each step so that clients can visualize style options.” -->
 4. **Stylist finishes with a quote**
     - “As a stylist, I want the tool to provide a quote based on my inputs so that I can close the consultation quickly.”
 
@@ -96,14 +95,14 @@ We will develop a **smart consultation and quoting tool** enhanced with AI capab
 1. **Step-by-Step Guided Flow**
     - The system must present a sequential list of questions or prompts.
     - The number of steps or questions should be configurable by an admin or product owner.
-2. **Multiple-Choice Questions**
+<!-- 2. **Multiple-Choice Questions**
     - Each step should allow multiple-choice inputs.
     - The system should allow text entry or additional notes in certain steps.
 3. **Visual Aids**
     - Each question can include an image or set of images.
-    - Images must be displayed in an optimized, mobile-responsive format.
+    - Images must be displayed in an optimized, mobile-responsive format. -->
 4. **Mobile-Responsive Design**
-    - The interface will be a tablet-first layout, but must adapt to various screen sizes (e.g., phones, desktops).
+    - The interface will be a mobile and tablet-first layout, but must adapt to various screen sizes (e.g., phones, desktops).
     - Buttons and text fields should remain accessible and easily clickable on smaller screens.
 
 ### 6.2 AI Integration
@@ -111,7 +110,7 @@ We will develop a **smart consultation and quoting tool** enhanced with AI capab
 1. **ChatGPT-4 Powered Assistance**
     - The system should call the ChatGPT-4 API (or relevant integration) at each relevant step to generate suggestions.
     - Suggestions must align with brand guidelines and knowledge base content.
-2. **Contextual Insights Based on User Responses**
+2. **Contextual Insights Based on Question and Phase at hand**
     - AI should receive the current user’s answers as context, providing tailored follow-up questions or clarifications.
 3. **Knowledge Base Integration**
     - An internal knowledge base or FAQ must be referenced to ensure brand alignment.
@@ -119,7 +118,7 @@ We will develop a **smart consultation and quoting tool** enhanced with AI capab
 4. **Real-Time Suggestions and Recommendations**
     - The tool should display relevant suggestions (style options, add-on services, etc.) immediately as the stylist inputs data.
 
-### 6.3 Visual Enhancement – BONUS
+<!-- ### 6.3 Visual Enhancement – BONUS
 
 1. **Integration of Provided Images**
     - Images supplied by the branding/marketing team should be dynamically linked to questions.
@@ -127,7 +126,7 @@ We will develop a **smart consultation and quoting tool** enhanced with AI capab
     - In this initial stage all images will me stored in th /public folder.
 2. **Optimized Image Loading and Display**
     - Images should be compressed or resized for fast loading without sacrificing quality.
-    - Loading indicators or placeholders should appear for slow connections.
+    - Loading indicators or placeholders should appear for slow connections. -->
 
 ### 6.4 User Authentication - BONUS
 
@@ -196,7 +195,7 @@ For scalability reasons, basic admin authentication will be added at the stage o
     - Basic consultation flow implementation
     - Deliverables: Wireframes, user flows, final UI designs
 2. **Phase 2 – MVP Development - 2nd week**
-    - Duration: 4–6 weeks
+    - Duration: 3 weeks
     - AI integration
     - Knowledge base implementation
     - Image integration

@@ -22,4 +22,4 @@
 ## Colours:
 **Primary**: #383838 for buttons 
 **Secondary**: #E6D4CB for backgrounds 
-**Tertiary** #F2F0EB and #E6D4CB for gradients and more contrast bg
+**Tertiary** #F2F0EB for gradients and more contrast bg

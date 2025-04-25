@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "console-ninja": {
+      "command": "node",
+      "args": ["~/.console-ninja/mcp/"]
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_7b956ca3391c20830b81a496044fb50452e895b5"
+      ]
+    }
+  }
+}
