@@ -12,6 +12,10 @@
         "--access-token",
         "sbp_7b956ca3391c20830b81a496044fb50452e895b5"
       ]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
     }
   }
 }
