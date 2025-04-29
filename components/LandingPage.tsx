@@ -70,7 +70,7 @@ export default function LandingPage() {
                 animate={{ y: 0 }}
                 exit={{ y: "100%" }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="w-full rounded-t-[32px] bg-white p-6 shadow-2xl"
+                className="w-full rounded-[32px] bg-white p-6 shadow-2xl"
               >
                 <AuthComponent />
               </motion.div>

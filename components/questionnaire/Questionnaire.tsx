@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import QuestionCard from "@/components/questionnaire/QuestionCard"
-import CategoryProgress from "@/components/questionnaire/CategoryProgress"
+import ProgressBar from "@/components/questionnaire/ProgressBar"
 import { knowledgeBase } from "@/utils/data"
 
 export default function Questionnaire() {
@@ -78,7 +78,7 @@ export default function Questionnaire() {
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-6">
-      <CategoryProgress
+      <ProgressBar
         categories={categories}
         currentCategoryIndex={currentCategoryIndex}
         completedCategories={completedCategories}
