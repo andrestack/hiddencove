@@ -1,9 +1,24 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
-import { NextRequest, NextResponse } from "next/server"
+import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
-// Default Next.js middleware to allow all requests
-export function middleware(request: NextRequest) {
-  return NextResponse.next()
+export async function middleware(request: NextRequest) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req: request, res })
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  // Check auth condition
+  if (!session && !request.nextUrl.pathname.startsWith("/auth")) {
+    // Redirect if there is no session and the route is not /auth
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = "/auth"
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  return res
 }
 
 /**
@@ -19,11 +34,18 @@ export function middleware(request: NextRequest) {
 //     }
 
 //     return NextResponse.next()
-// })  
+// })
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)|api/webhooks).*)",
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     * - public files
+     */
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 }
