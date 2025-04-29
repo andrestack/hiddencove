@@ -20,7 +20,7 @@ export default function LandingPage() {
   // If user is authenticated, redirect to dashboard
   useEffect(() => {
     if (!loading && user) {
-      router.push("/dashboard")
+      router.push("/questionnaire")
     }
   }, [user, loading, router])
 

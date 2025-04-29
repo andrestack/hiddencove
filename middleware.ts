@@ -79,6 +79,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
+  // If authenticated and trying to access root, redirect to questionnaire
+  if (session && request.nextUrl.pathname === "/") {
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = "/questionnaire"
+    return NextResponse.redirect(redirectUrl)
+  }
+
   return response
 }
 

@@ -46,6 +46,19 @@ export const clientOnboardingQuestions = {
     "How far down is the dimension in the root, if any?",
   ],
 }
+export interface Question {
+  id: string
+  question: string
+  guidance_text: string | string[]
+  context: string
+}
+
+export interface Category {
+  id: string
+  name: string
+  description: string
+  questions: Question[]
+}
 
 export const knowledgeBase = {
   categories: [
@@ -151,7 +164,7 @@ export const knowledgeBase = {
     },
     {
       id: "consultation_background",
-      name: "Consultation Background",
+      name: "Background",
       description: "Understanding client history and requirements",
       questions: [
         {
@@ -182,7 +195,7 @@ export const knowledgeBase = {
     },
     {
       id: "maintenance_assessment",
-      name: "Maintenance Assessment",
+      name: "Maintenance",
       description: "Understanding client's maintenance capabilities and preferences",
       questions: [
         {
@@ -274,7 +287,7 @@ export const knowledgeBase = {
     },
     {
       id: "mids",
-      name: "Mid Lengths",
+      name: "Mids",
       description: "Mid-length assessment and planning",
       questions: [
         {

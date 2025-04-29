@@ -4,7 +4,7 @@ import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { HelpCircle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
+//import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 
 interface QuestionCardProps {
@@ -20,8 +20,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   guidance_text,
   context,
-  value,
-  onChange,
+//   value,
+//   onChange,
   isActive,
 }) => {
   const [showInsight, setShowInsight] = useState(false)
@@ -51,12 +51,12 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           )}
         </div>
 
-        <Textarea
+        {/* <Textarea
           value={value || ""}
           onChange={(e) => onChange(e.target.value)}
           className="w-full border-[#E6D4CB] bg-white focus:border-[#383838]"
           rows={4}
-        />
+        /> */}
 
         <AnimatePresence>
           {showInsight && (guidance_text || context) && (
