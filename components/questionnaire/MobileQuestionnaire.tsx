@@ -136,10 +136,7 @@ export default function MobileQuestionnaire() {
 
   return (
     <div className="min-h-screen bg-[#f8f5ee] flex flex-col">
-      <div className="p-4 border-b border-[#e6dfd0] flex items-center">
-        <div className="w-8 h-8 rounded-full bg-[#d9b382] flex items-center justify-center mr-3"></div>
-        <h1 className="text-lg font-medium text-[#5c4c3a]">Salon Questionnaire</h1>
-      </div>
+      
 
       {/* Mobile Progress Indicator */}
       <div className="px-4 py-6">

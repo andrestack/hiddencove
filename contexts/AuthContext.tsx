@@ -99,10 +99,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
       console.log("Successfully signed out from Supabase")
-      // The onAuthStateChange listener will handle the redirect
+
+      // Manually set user to null and redirect
+      setUser(null)
+      // Small delay to ensure state update happens
+      setTimeout(() => {
+        router.push("/")
+        router.refresh()
+      }, 100)
     } catch (error) {
       console.error("Caught error during sign out:", error)
       setError(error as Error)
+
+      // Even if there's an error, try to sign the user out
+      setUser(null)
+      setTimeout(() => {
+        router.push("/")
+        router.refresh()
+      }, 100)
     }
   }
 
