@@ -6,6 +6,8 @@ import type { NextRequest } from "next/server"
 const publicRoutes = ["/", "/auth"]
 
 export async function middleware(request: NextRequest) {
+  console.log("Middleware running for path:", request.nextUrl.pathname)
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -58,35 +60,46 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-  // Check if the current route is public
-  const isPublicRoute = publicRoutes.some(
-    (route) => request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith("/auth/")
-  )
+    console.log("Session in middleware:", session ? "✅ Valid" : "❌ Not found")
 
-  // Allow access to public routes regardless of auth status
-  if (isPublicRoute) {
+    // Check if the current route is public
+    const isPublicRoute = publicRoutes.some(
+      (route) => request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith("/auth/")
+    )
+
+    console.log("Is public route:", isPublicRoute ? "Yes" : "No")
+
+    // Allow access to public routes regardless of auth status
+    if (isPublicRoute) {
+      return response
+    }
+
+    // If not a public route and no session, redirect to home
+    if (!session) {
+      console.log("No session, redirecting to home")
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = "/"
+      return NextResponse.redirect(redirectUrl)
+    }
+
+    // If authenticated and trying to access root, redirect to questionnaire
+    if (session && request.nextUrl.pathname === "/") {
+      console.log("User is authenticated, redirecting to questionnaire")
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = "/questionnaire"
+      return NextResponse.redirect(redirectUrl)
+    }
+
+    return response
+  } catch (error) {
+    console.error("Error in middleware:", error)
     return response
   }
-
-  // If not a public route and no session, redirect to home
-  if (!session) {
-    const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = "/"
-    return NextResponse.redirect(redirectUrl)
-  }
-
-  // If authenticated and trying to access root, redirect to questionnaire
-  if (session && request.nextUrl.pathname === "/") {
-    const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = "/questionnaire"
-    return NextResponse.redirect(redirectUrl)
-  }
-
-  return response
 }
 
 /**
