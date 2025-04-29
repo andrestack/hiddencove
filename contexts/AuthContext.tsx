@@ -45,8 +45,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return profile
     }
 
-    // Check active sessions and sets the user
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    // Function to handle user session state
+    const handleSession = async (session: any) => {
       if (session?.user) {
         const profile = await fetchProfile(session.user.id)
         setUser({
@@ -56,40 +56,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           full_name: profile?.full_name,
           avatar_url: profile?.avatar_url,
         })
+        // Redirect authenticated users to questionnaire if they're on the home page
+        if (window.location.pathname === "/") {
+          router.push("/questionnaire")
+        }
       } else {
         setUser(null)
+        // Redirect to home when user is null (signed out)
+        if (window.location.pathname !== "/") {
+          router.push("/")
+        }
       }
       setLoading(false)
+    }
+
+    // Check active sessions and sets the user
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      handleSession(session)
     })
 
     // Listen for changes on auth state (signed in, signed out, etc.)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id)
-        setUser({
-          id: session.user.id,
-          email: session.user.email,
-          role: profile?.role || "stylist",
-          full_name: profile?.full_name,
-          avatar_url: profile?.avatar_url,
-        })
-      } else {
-        setUser(null)
-        // Redirect to home when user is null (signed out)
-        router.push("/")
-        router.refresh()
-      }
-      setLoading(false)
+      await handleSession(session)
+      router.refresh()
     })
 
     return () => subscription.unsubscribe()
   }, [router])
 
   const signOut = async () => {
-    console.log("Starting sign out process...")
+    console.log("AuthContext: Starting sign out process...")
     try {
+      setLoading(true)
+
       // Clear user state immediately
       setUser(null)
 
@@ -97,34 +98,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const supabase = createClient()
 
       // Sign out from Supabase
-      console.log("Calling supabase.auth.signOut()...")
+      console.log("AuthContext: Calling supabase.auth.signOut()...")
       const { error } = await supabase.auth.signOut()
 
       if (error) {
-        console.error("Supabase signOut error:", error)
-        setError(error)
-      } else {
-        console.log("Successfully signed out from Supabase")
+        console.error("AuthContext: Supabase signOut error:", error)
+        throw error
       }
+
+      console.log("AuthContext: Successfully signed out from Supabase")
 
       // Clear any residual cookies manually
       document.cookie = "sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT"
       document.cookie = "sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT"
 
-      // Always force redirect to landing page
-      router.push("/")
-      router.refresh()
+      // Clear local storage
+      localStorage.removeItem("supabase.auth.token")
+
+      // Redirect to home page and force refresh
+      window.location.href = "/"
 
       return { success: true }
     } catch (error) {
-      console.error("Caught error during sign out:", error)
-      setError(error as Error)
-
-      // Force redirect even on error
-      router.push("/")
-      router.refresh()
-
-      return { success: false, error }
+      console.error("AuthContext: Error during sign out:", error)
+      // Even on error, redirect to home
+      window.location.href = "/"
+      throw error
+    } finally {
+      setLoading(false)
     }
   }
 

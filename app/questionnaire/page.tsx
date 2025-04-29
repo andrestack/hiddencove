@@ -1,31 +1,68 @@
 "use client"
 
+import { useEffect } from "react"
 import MobileQuestionnaire from "@/components/questionnaire/MobileQuestionnaire"
 import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
 
 export default function QuestionnairePage() {
-  const { signOut, user } = useAuth()
+  const { signOut, user, loading } = useAuth()
   const [isSigningOut, setIsSigningOut] = useState(false)
   const router = useRouter()
-  console.log(user)
+
+  // Protect the page
+  useEffect(() => {
+    if (!loading && !user) {
+      console.log("No authenticated user found, redirecting to home...")
+      router.replace("/")
+    }
+  }, [user, loading, router])
+
+  // If loading or no user, show loading state
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <span className="text-lg">Loading...</span>
+      </div>
+    )
+  }
 
   const handleSignOut = async () => {
     if (isSigningOut) return // Prevent multiple clicks
 
     setIsSigningOut(true)
-    console.log("Signing out...")
+    console.log("Starting sign out process...")
+
     try {
+      // Get a fresh Supabase client
+      const supabase = createClient()
+
+      // First try direct signout with Supabase
+      console.log("Attempting direct Supabase sign out...")
+      await supabase.auth.signOut()
+
+      // Then call context signOut
+      console.log("Calling context signOut...")
       await signOut()
-      // Force redirect to home page
-      router.push("/")
-      console.log("Sign out completed")
+
+      // Clear any lingering cookies manually
+      document.cookie = "sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT"
+      document.cookie = "sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT"
+
+      console.log("Sign out completed, redirecting...")
+
+      // Force a hard refresh to clear any cached state
+      window.location.href = "/"
     } catch (error) {
-      console.error("Error signing out:", error)
+      console.error("Error during sign out:", error)
       setIsSigningOut(false)
+
+      // If error, still try to force redirect
+      window.location.href = "/"
     }
   }
 
@@ -44,7 +81,7 @@ export default function QuestionnairePage() {
           className="flex items-center gap-2 border-gray-200 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
         >
           <LogOut className="h-4 w-4" />
-          {isSigningOut ? "Goodbye." : ""}
+          {isSigningOut ? "Signing out..." : "Sign out"}
         </Button>
       </div>
 
