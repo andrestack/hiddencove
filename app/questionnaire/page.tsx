@@ -5,10 +5,13 @@ import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 export default function QuestionnairePage() {
   const { signOut, user } = useAuth()
   const [isSigningOut, setIsSigningOut] = useState(false)
+  const router = useRouter()
+  console.log(user)
 
   const handleSignOut = async () => {
     if (isSigningOut) return // Prevent multiple clicks
@@ -17,6 +20,8 @@ export default function QuestionnairePage() {
     console.log("Signing out...")
     try {
       await signOut()
+      // Force redirect to home page
+      router.push("/")
       console.log("Sign out completed")
     } catch (error) {
       console.error("Error signing out:", error)
@@ -33,13 +38,13 @@ export default function QuestionnairePage() {
         </div>
 
         <Button
-          variant="ghost"
+          variant="outline"
           onClick={handleSignOut}
           disabled={isSigningOut}
-          className="flex items-center gap-2 bg-[#f8f5ee] text-[#383838]/70 hover:text-[#383838]"
+          className="flex items-center gap-2 border-gray-200 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
         >
           <LogOut className="h-4 w-4" />
-          {isSigningOut ? "Signing out..." : "Sign Out"}
+          {isSigningOut ? "Goodbye." : ""}
         </Button>
       </div>
 

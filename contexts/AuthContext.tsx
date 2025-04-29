@@ -89,34 +89,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     console.log("Starting sign out process...")
-    const supabase = createClient()
     try {
+      // Clear user state immediately
+      setUser(null)
+
+      // Get fresh Supabase client
+      const supabase = createClient()
+
+      // Sign out from Supabase
       console.log("Calling supabase.auth.signOut()...")
       const { error } = await supabase.auth.signOut()
+
       if (error) {
         console.error("Supabase signOut error:", error)
         setError(error)
-        return
+      } else {
+        console.log("Successfully signed out from Supabase")
       }
-      console.log("Successfully signed out from Supabase")
 
-      // Manually set user to null and redirect
-      setUser(null)
-      // Small delay to ensure state update happens
-      setTimeout(() => {
-        router.push("/")
-        router.refresh()
-      }, 100)
+      // Clear any residual cookies manually
+      document.cookie = "sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT"
+      document.cookie = "sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT"
+
+      // Always force redirect to landing page
+      router.push("/")
+      router.refresh()
+
+      return { success: true }
     } catch (error) {
       console.error("Caught error during sign out:", error)
       setError(error as Error)
 
-      // Even if there's an error, try to sign the user out
-      setUser(null)
-      setTimeout(() => {
-        router.push("/")
-        router.refresh()
-      }, 100)
+      // Force redirect even on error
+      router.push("/")
+      router.refresh()
+
+      return { success: false, error }
     }
   }
 
