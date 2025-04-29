@@ -2,6 +2,9 @@ import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
+// Define public routes that don't require authentication
+const publicRoutes = ["/", "/auth"]
+
 export async function middleware(request: NextRequest) {
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req: request, res })
@@ -10,11 +13,20 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Check auth condition
-  if (!session && !request.nextUrl.pathname.startsWith("/auth")) {
-    // Redirect if there is no session and the route is not /auth
+  // Check if the current route is public
+  const isPublicRoute = publicRoutes.some(
+    (route) => request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith("/auth/")
+  )
+
+  // Allow access to public routes regardless of auth status
+  if (isPublicRoute) {
+    return res
+  }
+
+  // If not a public route and no session, redirect to home
+  if (!session) {
     const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = "/auth"
+    redirectUrl.pathname = "/"
     return NextResponse.redirect(redirectUrl)
   }
 

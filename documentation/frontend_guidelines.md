@@ -16,8 +16,8 @@
    - **clsx** and **tailwind-merge**: For conditional class name handling
 
 ## Fonts:
-**Headings**: Orpheus Pro
-**Text**: Neue Haas Grotesk
+**Headings**: DM Serif Text
+**Text**: Red Hat Display
 
 ## Colours:
 **Primary**: #383838 for buttons 

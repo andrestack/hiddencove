@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
+import { createClient } from "@/lib/supabase/client"
 import { AuthContextType, UserWithRole } from "@/types/auth"
 
 const AuthContext = createContext<AuthContextType>({
@@ -25,6 +25,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
+    const supabase = createClient()
+
     // Function to fetch user profile
     const fetchProfile = async (userId: string) => {
       const { data: profile, error } = await supabase
@@ -81,6 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signOut = async () => {
+    const supabase = createClient()
     try {
       const { error } = await supabase.auth.signOut()
       if (error) {
@@ -98,5 +101,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut,
   }
 
-  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
