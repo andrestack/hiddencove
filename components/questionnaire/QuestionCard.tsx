@@ -20,8 +20,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   guidance_text,
   context,
-//   value,
-//   onChange,
+  //   value,
+  //   onChange,
   isActive,
 }) => {
   const [showInsight, setShowInsight] = useState(false)
