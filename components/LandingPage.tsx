@@ -53,7 +53,7 @@ export default function LandingPage() {
           <Button
             size="lg"
             onClick={() => setShowAuth(true)}
-            className="font-red-hat group rounded-full bg-[#383838] px-8 py-6 text-lg text-white hover:bg-[#383838]/20"
+            className="font-red-hat group rounded-full bg-[#383838] px-8 py-6 text-lg text-white hover:bg-[#D7A5A9]"
           >
             Begin Questionnaire
             <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
