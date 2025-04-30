@@ -19,6 +19,8 @@ function QuestionnairePageContent() {
   const [isSigningOut, setIsSigningOut] = useState(false)
   const [mounted, setMounted] = useState(false)
 
+  console.log(user)
+
   useEffect(() => {
     setMounted(true)
     if (!isLoading && !user) {
@@ -52,8 +54,8 @@ function QuestionnairePageContent() {
     <main className="container mx-auto flex min-h-screen flex-col px-4 py-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-4xl text-[#383838]">Hidden Cove</h1>
-          <h2 className="font-serif text-xl text-[#D7A5A9]">Customer Questionnaire</h2>
+          <h1 className="font-dm-serif text-4xl text-[#383838]">Hidden Cove</h1>
+          <h2 className="font-dm-serif text-xl text-[#D7A5A9]">Customer Questionnaire</h2>
         </div>
 
         <Button
@@ -68,7 +70,9 @@ function QuestionnairePageContent() {
       </div>
 
       <div className="flex-1">
-        <h2 className="py-4 text-xl">Hey {user?.full_name || "there"}! Welcome back</h2>
+        <h2 className="py-4 font-red-hat text-xl">
+          Hey {user?.user_metadata?.full_name || "there"}! Welcome back
+        </h2>
         <MobileQuestionnaire />
       </div>
     </main>
