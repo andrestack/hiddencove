@@ -20,6 +20,16 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn")
   const [error, setError] = useState<string | null>(null)
 
+  // Get the current domain for redirects
+  const getRedirectUrl = () => {
+    // In development, use localhost
+    if (process.env.NODE_ENV === "development") {
+      return `${window.location.origin}/auth/callback`
+    }
+    // In production, use the actual domain
+    return `${window.location.origin}/auth/callback`
+  }
+
   useEffect(() => {
     // Handle session change to close the auth dialog if needed
     const {
@@ -40,7 +50,11 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: getRedirectUrl(),
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
         },
       })
 
@@ -100,7 +114,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: getRedirectUrl(),
             data: {
               full_name: name,
             },
