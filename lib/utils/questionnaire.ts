@@ -4,6 +4,7 @@ export interface MobileQuestion {
   id: string
   text: string
   tooltip: string
+  isValid?: boolean
 }
 
 export interface MobileStep {
@@ -45,5 +46,5 @@ export function validateQuestionAnswer(answer: string | undefined): boolean {
 }
 
 export function isStepValid(step: MobileStep): boolean {
-  return step.questions.every((q) => q.isValid)
+  return step.questions.every((q) => validateQuestionAnswer(q.text))
 }

@@ -1,4 +1,5 @@
 import { createBrowserClient } from "@supabase/ssr"
+import { PostgrestError } from "@supabase/supabase-js"
 
 let supabaseClient: ReturnType<typeof createBrowserClient> | null = null
 
@@ -23,7 +24,7 @@ export const createClient = () => {
     const query = originalFrom(tableName)
 
     // Add response interceptor
-    query.then(({ error }) => {
+    query.then(({ error }: { error: PostgrestError | null }) => {
       if (error?.code === "401") {
         console.warn("Unauthorized request, refreshing session...")
         supabaseClient?.auth.refreshSession()

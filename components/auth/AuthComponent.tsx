@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { FcGoogle } from "react-icons/fc"
 import { Mail, Lock, Loader2, User } from "lucide-react"
+import { AuthChangeEvent, Session } from "@supabase/supabase-js"
 
 interface AuthComponentProps {
   onClose?: () => void
@@ -23,7 +24,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
     // Handle session change to close the auth dialog if needed
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
       if (session && onClose) {
         onClose()
       }

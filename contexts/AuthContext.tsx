@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import type { User } from "@supabase/supabase-js"
+import type { User, AuthChangeEvent } from "@supabase/supabase-js"
 
 type AuthContextType = {
   user: User | null
@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event) => {
+    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
       if (event === "SIGNED_OUT" && isMounted) {
         setUser(null)
         router.replace("/")
