@@ -1,24 +1,38 @@
 import { createBrowserClient } from "@supabase/ssr"
 
-export function createClient() {
-  return createBrowserClient(
+let supabaseClient: ReturnType<typeof createBrowserClient> | null = null
+
+export const createClient = () => {
+  if (supabaseClient) return supabaseClient
+
+  supabaseClient = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: {
-        get(name: string) {
-          return document.cookie
-            .split("; ")
-            .find((row) => row.startsWith(`${name}=`))
-            ?.split("=")[1]
-        },
-        set(name: string, value: string, options: { maxAge?: number } = {}) {
-          document.cookie = `${name}=${value}; path=/; max-age=${options.maxAge ?? 0}`
-        },
-        remove(name: string) {
-          document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT`
-        },
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
       },
     }
   )
+
+  // Add error handling for 401 responses
+  const originalFrom = supabaseClient.from
+  supabaseClient.from = (tableName: string) => {
+    const query = originalFrom(tableName)
+
+    // Add response interceptor
+    query.then(({ error }) => {
+      if (error?.code === "401") {
+        console.warn("Unauthorized request, refreshing session...")
+        supabaseClient?.auth.refreshSession()
+      }
+      return { data: null, error }
+    })
+
+    return query
+  }
+
+  return supabaseClient
 }

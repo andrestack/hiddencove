@@ -10,25 +10,30 @@ import { useAuth } from "@/contexts/AuthContext"
 import { useRouter } from "next/navigation"
 
 // Dynamically import the Auth component to prevent SSR
-const AuthComponent = dynamic(() => import("@/components/auth/AuthComponent"), { ssr: false })
+const AuthComponent = dynamic(() => import("@/components/auth/AuthComponent"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full max-w-md rounded-[32px] bg-white p-6 shadow-2xl">Loading auth...</div>
+  ),
+})
 
 export default function LandingPage() {
-  const [showAuth, setShowAuth] = useState(false)
-  const { user, loading } = useAuth()
+  const { user, isLoading } = useAuth()
   const router = useRouter()
+  const [showAuth, setShowAuth] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  // If user is authenticated, redirect to dashboard
   useEffect(() => {
-    if (!loading && user) {
+    setMounted(true)
+    if (!isLoading && user) {
       router.push("/questionnaire")
     }
-  }, [user, loading, router])
+  }, [isLoading, user, router])
 
-  // Show loading state while checking auth status
-  if (loading) {
+  if (!mounted || isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <span className="text-lg">Loading...</span>
+        <div className="animate-pulse text-lg text-gray-500">Loading session...</div>
       </div>
     )
   }

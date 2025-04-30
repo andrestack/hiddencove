@@ -1,29 +1,32 @@
 "use client"
 
-import { useEffect } from "react"
-import MobileQuestionnaire from "@/components/questionnaire/MobileQuestionnaire"
+import { useEffect, useState } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
-import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
+import dynamic from "next/dynamic"
 
-export default function QuestionnairePage() {
-  const { signOut, user, loading } = useAuth()
-  const [isSigningOut, setIsSigningOut] = useState(false)
+// Dynamically import MobileQuestionnaire to prevent SSR
+const MobileQuestionnaire = dynamic(
+  () => import("@/components/questionnaire/MobileQuestionnaire"),
+  { ssr: false, loading: () => <div>Loading questionnaire...</div> }
+)
+
+function QuestionnairePageContent() {
+  const { user, isLoading, signOut } = useAuth()
   const router = useRouter()
+  const [isSigningOut, setIsSigningOut] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  // Protect the page
   useEffect(() => {
-    if (!loading && !user) {
-      console.log("No authenticated user found, redirecting to home...")
+    setMounted(true)
+    if (!isLoading && !user) {
       router.replace("/")
     }
-  }, [user, loading, router])
+  }, [isLoading, user, router])
 
-  // If loading or no user, show loading state
-  if (loading || !user) {
+  if (!mounted || isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <span className="text-lg">Loading...</span>
@@ -31,38 +34,17 @@ export default function QuestionnairePage() {
     )
   }
 
+  if (!user) return null
+
   const handleSignOut = async () => {
-    if (isSigningOut) return // Prevent multiple clicks
-
+    if (isSigningOut) return
     setIsSigningOut(true)
-    console.log("Starting sign out process...")
-
     try {
-      // Get a fresh Supabase client
-      const supabase = createClient()
-
-      // First try direct signout with Supabase
-      console.log("Attempting direct Supabase sign out...")
-      await supabase.auth.signOut()
-
-      // Then call context signOut
-      console.log("Calling context signOut...")
       await signOut()
-
-      // Clear any lingering cookies manually
-      document.cookie = "sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT"
-      document.cookie = "sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT"
-
-      console.log("Sign out completed, redirecting...")
-
-      // Force a hard refresh to clear any cached state
       window.location.href = "/"
     } catch (error) {
-      console.error("Error during sign out:", error)
+      console.error("Sign out error:", error)
       setIsSigningOut(false)
-
-      // If error, still try to force redirect
-      window.location.href = "/"
     }
   }
 
@@ -92,3 +74,13 @@ export default function QuestionnairePage() {
     </main>
   )
 }
+
+// Wrap in dynamic import to prevent SSR
+export default dynamic(() => Promise.resolve(QuestionnairePageContent), {
+  ssr: false,
+  loading: () => (
+    <div className="flex min-h-screen items-center justify-center">
+      <span className="text-lg">Loading...</span>
+    </div>
+  ),
+})
