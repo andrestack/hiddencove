@@ -23,57 +23,130 @@ export const useAuth = () => {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserWithRole | null>(null)
   const [loading, setLoading] = useState(true)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<Error | null>(null)
   const router = useRouter()
 
   useEffect(() => {
     const supabase = createClient()
+    let isMounted = true
 
     // Function to fetch user profile
     const fetchProfile = async (userId: string) => {
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single()
+      try {
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", userId)
+          .single()
 
-      if (error) {
-        console.error("Error fetching profile:", error)
+        if (error) {
+          console.error("Error fetching profile:", error)
+          return null
+        }
+
+        return profile
+      } catch (err) {
+        console.error("Exception fetching profile:", err)
         return null
       }
-
-      return profile
     }
 
     // Function to handle user session state
-    const handleSession = async (session: any) => {
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id)
-        setUser({
-          id: session.user.id,
-          email: session.user.email,
-          role: profile?.role || "stylist",
-          full_name: profile?.full_name,
-          avatar_url: profile?.avatar_url,
-        })
-        // Redirect authenticated users to questionnaire if they're on the home page
-        if (window.location.pathname === "/") {
-          router.push("/questionnaire")
+    const handleSession = async (
+      session: {
+        user: { id: string; email: string; user_metadata?: { full_name?: string } }
+      } | null
+    ) => {
+      try {
+        if (session?.user) {
+          console.log("Got valid session, fetching profile...")
+          const profile = await fetchProfile(session.user.id)
+
+          // Get the full name from either the profile or user metadata
+          const fullName =
+            profile?.full_name ||
+            session.user.user_metadata?.full_name ||
+            localStorage.getItem("userFullName")
+
+          if (isMounted) {
+            setUser({
+              id: session.user.id,
+              email: session.user.email,
+              role: profile?.role || "stylist",
+              full_name: fullName,
+              avatar_url: profile?.avatar_url,
+            })
+
+            // Only redirect on initial load
+            const isFirstLoad = localStorage.getItem("_auth_initialized") !== "true"
+            if (isFirstLoad) {
+              localStorage.setItem("_auth_initialized", "true")
+              // Clear stored name after successful initialization
+              localStorage.removeItem("userFullName")
+
+              // Redirect authenticated users to questionnaire if they're on the home page
+              if (window.location.pathname === "/") {
+                router.push("/questionnaire")
+              }
+            }
+          }
+        } else {
+          if (isMounted) {
+            setUser(null)
+
+            // Only redirect on initial load
+            const isFirstLoad = localStorage.getItem("_auth_initialized") !== "true"
+            if (isFirstLoad) {
+              localStorage.setItem("_auth_initialized", "true")
+              // Redirect to home when user is null (signed out)
+              if (
+                window.location.pathname !== "/" &&
+                window.location.pathname !== "/auth/callback"
+              ) {
+                router.push("/")
+              }
+            }
+          }
         }
-      } else {
-        setUser(null)
-        // Redirect to home when user is null (signed out)
-        if (window.location.pathname !== "/") {
-          router.push("/")
+
+        if (isMounted) {
+          setLoading(false)
+        }
+      } catch (err) {
+        console.error("Error in handleSession:", err)
+        if (isMounted) {
+          setLoading(false)
+          setError(err as Error)
         }
       }
-      setLoading(false)
     }
 
-    // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      handleSession(session)
-    })
+    // Check active sessions and set the user
+    const initializeAuth = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession()
+
+        if (error) {
+          console.error("Error getting session:", error)
+          if (isMounted) {
+            setLoading(false)
+            setError(error)
+          }
+          return
+        }
+
+        await handleSession(data.session)
+      } catch (err) {
+        console.error("Exception during auth initialization:", err)
+        if (isMounted) {
+          setLoading(false)
+          setError(err as Error)
+        }
+      }
+    }
+
+    initializeAuth()
 
     // Listen for changes on auth state (signed in, signed out, etc.)
     const {
@@ -83,16 +156,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       router.refresh()
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
   }, [router])
 
   const signOut = async () => {
     console.log("AuthContext: Starting sign out process...")
     try {
       setLoading(true)
-
-      // Clear user state immediately
-      setUser(null)
 
       // Get fresh Supabase client
       const supabase = createClient()
@@ -108,12 +181,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       console.log("AuthContext: Successfully signed out from Supabase")
 
-      // Clear any residual cookies manually
-      document.cookie = "sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT"
-      document.cookie = "sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT"
-
-      // Clear local storage
-      localStorage.removeItem("supabase.auth.token")
+      // Clear user state after successful signout
+      setUser(null)
 
       // Redirect to home page and force refresh
       window.location.href = "/"

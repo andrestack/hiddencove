@@ -73,24 +73,35 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
       setError(null)
 
       if (mode === "signIn") {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         })
 
         if (error) {
+          if (error.message.includes("Email not confirmed")) {
+            setError("Please check your email to confirm your account first.")
+            return
+          }
           setError(error.message)
           throw error
         }
+
+        // Close modal and redirect on successful sign in
+        if (data.session) {
+          if (onClose) {
+            onClose()
+          }
+          window.location.href = "/questionnaire"
+        }
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback`,
             data: {
               full_name: name,
-              name: name, // Adding both formats for compatibility
             },
           },
         })
@@ -100,7 +111,20 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
           throw error
         }
 
-        setError("Check your email for a confirmation link.")
+        // If user exists but no identities, they need to sign in
+        if (data?.user && !data?.user?.identities?.length) {
+          setError("An account with this email already exists. Please sign in instead.")
+          setMode("signIn")
+          setPassword("")
+          return
+        }
+
+        // Show confirmation message and store pending confirmation
+        if (data?.user?.identities?.length) {
+          setError("Please check your email for a confirmation link.")
+          localStorage.setItem("pendingConfirmation", "true")
+          localStorage.setItem("userFullName", name) // Store name for later use
+        }
       }
     } catch (error) {
       console.error("Auth error:", error)
@@ -120,10 +144,10 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
   return (
     <div className="w-full max-w-md space-y-8">
       <div>
-        <h2 className="font-dm-serif mt-6 text-center text-3xl font-normal text-gray-900">
+        <h2 className="mt-6 text-center font-dm-serif text-3xl font-normal text-gray-900">
           Welcome to Hidden Cove
         </h2>
-        <p className="font-red-hat mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center font-red-hat text-sm text-gray-600">
           {mode === "signIn"
             ? "Sign in to access your onboarding questionnaire"
             : "Create an account to begin your journey"}
@@ -137,7 +161,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
       <form onSubmit={handleEmailAuth} className="mt-8 space-y-2">
         {mode === "signUp" && (
           <div>
-            <label htmlFor="name" className="font-red-hat sr-only">
+            <label htmlFor="name" className="sr-only font-red-hat">
               Name
             </label>
             <div className="relative">
@@ -152,7 +176,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="font-red-hat block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
+                className="block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 font-red-hat text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
                 placeholder="Your full name"
                 disabled={isLoading}
               />
@@ -160,7 +184,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
           </div>
         )}
         <div>
-          <label htmlFor="email" className="font-red-hat sr-only">
+          <label htmlFor="email" className="sr-only font-red-hat">
             Email
           </label>
           <div className="relative">
@@ -175,7 +199,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="font-red-hat block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
+              className="block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 font-red-hat text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
               placeholder="Email address"
               disabled={isLoading}
             />
@@ -183,7 +207,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
         </div>
 
         <div>
-          <label htmlFor="password" className="font-red-hat sr-only">
+          <label htmlFor="password" className="sr-only font-red-hat">
             Password
           </label>
           <div className="relative">
@@ -198,7 +222,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="font-red-hat block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
+              className="block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 font-red-hat text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
               placeholder="Password"
               disabled={isLoading}
             />
@@ -208,7 +232,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
         <Button
           type="submit"
           disabled={isLoading}
-          className="font-red-hat w-full bg-[#383838] text-white hover:bg-[#282828]"
+          className="w-full bg-[#383838] font-red-hat text-white hover:bg-[#282828]"
         >
           {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           {mode === "signIn" ? "Sign in" : "Sign up"}

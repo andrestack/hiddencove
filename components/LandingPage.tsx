@@ -24,8 +24,14 @@ export default function LandingPage() {
     }
   }, [user, loading, router])
 
-  // Show nothing while checking auth status
-  if (loading) return null
+  // Show loading state while checking auth status
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <span className="text-lg">Loading...</span>
+      </div>
+    )
+  }
 
   return (
     <main className="flex min-h-screen flex-col">
@@ -46,14 +52,14 @@ export default function LandingPage() {
       {/* Content section */}
       <div className="container mx-auto flex flex-1 flex-col items-center px-8 py-12">
         <div className="max-w-2xl text-center">
-          <p className="font-red-hat mb-12 text-left text-xl text-[#383838]/70">
+          <p className="mb-12 text-left font-red-hat text-xl text-[#383838]/70">
             A guided onboarding to help our customers get the most out of their session with you.
           </p>
 
           <Button
             size="lg"
             onClick={() => setShowAuth(true)}
-            className="font-red-hat group rounded-full bg-[#383838] px-8 py-6 text-lg text-white hover:bg-[#D7A5A9]"
+            className="group rounded-full bg-[#383838] px-8 py-6 font-red-hat text-lg text-white hover:bg-[#D7A5A9]"
           >
             Begin Questionnaire
             <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />

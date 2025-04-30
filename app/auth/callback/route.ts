@@ -41,8 +41,13 @@ export async function GET(request: Request) {
 
       console.log("Session created successfully:", data.session ? "✅" : "❌")
 
-      // URL to redirect to after sign in process completes
-      return NextResponse.redirect(new URL("/questionnaire", requestUrl.origin))
+      // Always redirect to questionnaire after successful auth
+      const redirectUrl = new URL("/questionnaire", requestUrl.origin)
+
+      // Add success parameter for UI feedback
+      redirectUrl.searchParams.set("auth_success", "true")
+
+      return NextResponse.redirect(redirectUrl)
     } catch (err) {
       console.error("Exception during auth callback:", err)
       return NextResponse.redirect(
