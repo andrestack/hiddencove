@@ -1,51 +1,51 @@
-export const clientOnboardingQuestions = {
-  appearanceAndStylePreferences: [
-    "What are you not liking about your current hair?",
-    "What are you liking?",
-    "What is the priority to achieve today?",
-    "When your hair is out, what is important to you?",
-    "When it's up, what is important to you?",
-    "What is the feeling or vibe you want for today?",
-    "Are you happy with your current hairstyle?",
-    "Interested in trying a new hair color or style?",
-    "If you could have your dream hair today, what would that look like?",
-    "Do you have any pictures of colours that you like?",
-    "What do you like about this photo?",
-    "What don't you like about this picture?",
-  ],
-  routineAndCare: [
-    "What's your current hair care routine?",
-    "What is your home care routine like?",
-    "How has your current shampoo and conditioner been feeling on your scalp?",
-    "Are you using salon quality hair care?",
-    "Are you using tank water?",
-    "How much time do you typically spend on styling your hair?",
-    "How much time will you dedicate to the tone of your hair?",
-    "How much time will you allow to your hair styling?",
-  ],
-  goalsAndConcerns: [
-    "Any specific hair concerns or issues?",
-    "What are your long-term hair goals?",
-    "Do you have a budget in mind?",
-    "Would you like to take a slower approach and build towards your goal?",
-    "Are you wanting to try and achieve this in one appointment?",
-  ],
-  previousExperience: [
-    "What led you to try a new stylist?",
-    "Was there anything that didn't work after your last appointment?",
-  ],
-  flexibilityAndServices: [
-    "Do you have any allergies to hair products?",
-    "Any upcoming events requiring a special hairstyle?",
-    "Open to exploring new hair treatments or services?",
-    "We can amend the service to suit your budget. Does that work for you?",
-  ],
-  inDepthConsultationOptions: [
-    "How bold do you want the blonde?",
-    "Are all the ends a solid blonde, or is there dimension in the photo?",
-    "How far down is the dimension in the root, if any?",
-  ],
-}
+// export const clientOnboardingQuestions = {
+//   appearanceAndStylePreferences: [
+//     "What are you not liking about your current hair?",
+//     "What are you liking?",
+//     "What is the priority to achieve today?",
+//     "When your hair is out, what is important to you?",
+//     "When it's up, what is important to you?",
+//     "What is the feeling or vibe you want for today?",
+//     "Are you happy with your current hairstyle?",
+//     "Interested in trying a new hair color or style?",
+//     "If you could have your dream hair today, what would that look like?",
+//     "Do you have any pictures of colours that you like?",
+//     "What do you like about this photo?",
+//     "What don't you like about this picture?",
+//   ],
+//   routineAndCare: [
+//     "What's your current hair care routine?",
+//     "What is your home care routine like?",
+//     "How has your current shampoo and conditioner been feeling on your scalp?",
+//     "Are you using salon quality hair care?",
+//     "Are you using tank water?",
+//     "How much time do you typically spend on styling your hair?",
+//     "How much time will you dedicate to the tone of your hair?",
+//     "How much time will you allow to your hair styling?",
+//   ],
+//   goalsAndConcerns: [
+//     "Any specific hair concerns or issues?",
+//     "What are your long-term hair goals?",
+//     "Do you have a budget in mind?",
+//     "Would you like to take a slower approach and build towards your goal?",
+//     "Are you wanting to try and achieve this in one appointment?",
+//   ],
+//   previousExperience: [
+//     "What led you to try a new stylist?",
+//     "Was there anything that didn't work after your last appointment?",
+//   ],
+//   flexibilityAndServices: [
+//     "Do you have any allergies to hair products?",
+//     "Any upcoming events requiring a special hairstyle?",
+//     "Open to exploring new hair treatments or services?",
+//     "We can amend the service to suit your budget. Does that work for you?",
+//   ],
+//   inDepthConsultationOptions: [
+//     "How bold do you want the blonde?",
+//     "Are all the ends a solid blonde, or is there dimension in the photo?",
+//     "How far down is the dimension in the root, if any?",
+//   ],
+// }
 export interface Question {
   id: string
   question: string

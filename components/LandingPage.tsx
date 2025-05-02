@@ -32,9 +32,9 @@ export default function LandingPage() {
 
   if (!mounted || isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <main className="flex min-h-screen items-center justify-center">
         <div className="animate-pulse text-lg text-gray-500">Loading session...</div>
-      </div>
+      </main>
     )
   }
 

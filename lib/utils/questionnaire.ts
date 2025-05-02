@@ -1,4 +1,4 @@
-import { Category, knowledgeBase } from "@/utils/data"
+import { Category, knowledgeBase } from "@/lib/data"
 
 export interface MobileQuestion {
   id: string
