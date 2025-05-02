@@ -6,6 +6,22 @@ import { Button } from "@/components/ui/button"
 import { FcGoogle } from "react-icons/fc"
 import { Mail, Lock, Loader2, User } from "lucide-react"
 import { AuthChangeEvent, Session } from "@supabase/supabase-js"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+
+// Form schema for both sign in and sign up
+const signInSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+})
+
+const signUpSchema = signInSchema.extend({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+})
+
+type SignInFormValues = z.infer<typeof signInSchema>
+type SignUpFormValues = z.infer<typeof signUpSchema>
 
 interface AuthComponentProps {
   onClose?: () => void
@@ -14,11 +30,17 @@ interface AuthComponentProps {
 export default function AuthComponent({ onClose }: AuthComponentProps) {
   const supabase = createClient()
   const [isLoading, setIsLoading] = useState(false)
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn")
-  const [error, setError] = useState<string | null>(null)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<SignInFormValues | SignUpFormValues>({
+    resolver: zodResolver(mode === "signIn" ? signInSchema : signUpSchema),
+    mode: "onBlur",
+  })
 
   // Get the current domain for redirects
   const getRedirectUrl = () => {
@@ -46,7 +68,6 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true)
-      setError(null)
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -60,7 +81,6 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
 
       if (error) {
         console.error("Error signing in with Google:", error.message)
-        setError(error.message)
         throw error
       }
     } catch (error) {
@@ -70,79 +90,60 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
     }
   }
 
-  const handleEmailAuth = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!email || !password) {
-      setError("Please enter both email and password")
-      return
-    }
-
-    if (mode === "signUp" && !name) {
-      setError("Please enter your name")
-      return
-    }
-
+  const onSubmit = async (data: SignInFormValues | SignUpFormValues) => {
     try {
       setIsLoading(true)
-      setError(null)
 
       if (mode === "signIn") {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+        const { data: authData, error } = await supabase.auth.signInWithPassword({
+          email: data.email,
+          password: data.password,
         })
 
         if (error) {
           if (error.message.includes("Email not confirmed")) {
-            setError("Please check your email to confirm your account first.")
-            return
+            throw new Error("Please check your email to confirm your account first.")
           }
-          setError(error.message)
           throw error
         }
 
         // Close modal and redirect on successful sign in
-        if (data.session) {
+        if (authData.session) {
           if (onClose) {
             onClose()
           }
           window.location.href = "/questionnaire"
         }
       } else {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
+        const { data: signUpData, error } = await supabase.auth.signUp({
+          email: data.email,
+          password: data.password,
           options: {
             emailRedirectTo: getRedirectUrl(),
             data: {
-              full_name: name,
+              full_name: "name" in data ? data.name : "",
             },
           },
         })
 
         if (error) {
-          setError(error.message)
           throw error
         }
 
         // If user exists but no identities, they need to sign in
-        if (data?.user && !data?.user?.identities?.length) {
-          setError("An account with this email already exists. Please sign in instead.")
-          setMode("signIn")
-          setPassword("")
-          return
+        if (signUpData?.user && !signUpData?.user?.identities?.length) {
+          throw new Error("An account with this email already exists. Please sign in instead.")
         }
 
         // Show confirmation message and store pending confirmation
-        if (data?.user?.identities?.length) {
-          setError("Please check your email for a confirmation link.")
+        if (signUpData?.user?.identities?.length) {
           localStorage.setItem("pendingConfirmation", "true")
-          localStorage.setItem("userFullName", name) // Store name for later use
+          localStorage.setItem("userFullName", "name" in data ? data.name : "")
+          throw new Error("Please check your email for a confirmation link.")
         }
       }
     } catch (error) {
-      console.error("Auth error:", error)
+      return error instanceof Error ? error.message : "An error occurred"
     } finally {
       setIsLoading(false)
     }
@@ -150,11 +151,8 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
 
   // Reset form when switching modes
   useEffect(() => {
-    setError(null)
-    if (mode === "signIn") {
-      setName("")
-    }
-  }, [mode])
+    reset()
+  }, [mode, reset])
 
   return (
     <div className="w-full max-w-md space-y-8">
@@ -169,11 +167,13 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
         </p>
       </div>
 
-      {error && (
-        <div className="rounded-md bg-red-50 p-3 text-center text-sm text-red-600">{error}</div>
+      {errors.root?.message && (
+        <div className="rounded-md bg-red-50 p-3 text-center text-sm text-red-600">
+          {errors.root.message}
+        </div>
       )}
 
-      <form onSubmit={handleEmailAuth} className="mt-8 space-y-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-2">
         {mode === "signUp" && (
           <div>
             <label htmlFor="name" className="sr-only font-red-hat">
@@ -185,17 +185,15 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
               </div>
               <input
                 id="name"
-                name="name"
                 type="text"
                 autoComplete="name"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                {...register("name")}
                 className="block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 font-red-hat text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
                 placeholder="Your full name"
                 disabled={isLoading}
               />
             </div>
+            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
           </div>
         )}
         <div>
@@ -208,17 +206,15 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
             </div>
             <input
               id="email"
-              name="email"
               type="email"
               autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...register("email")}
               className="block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 font-red-hat text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
               placeholder="Email address"
               disabled={isLoading}
             />
           </div>
+          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
         </div>
 
         <div>
@@ -231,17 +227,17 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
             </div>
             <input
               id="password"
-              name="password"
               type="password"
               autoComplete={mode === "signIn" ? "current-password" : "new-password"}
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              {...register("password")}
               className="block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 font-red-hat text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
               placeholder="Password"
               disabled={isLoading}
             />
           </div>
+          {errors.password && (
+            <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+          )}
         </div>
 
         <Button
