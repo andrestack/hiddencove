@@ -1,7 +1,7 @@
 "use client"
 
 import { Info, X } from "lucide-react"
-import { Question } from "@/context/questionnaire-context"
+import { Question } from "@/contexts/questionnaire-context"
 
 interface QuestionCardProps {
   question: Question

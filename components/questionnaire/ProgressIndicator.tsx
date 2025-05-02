@@ -1,7 +1,7 @@
 "use client"
 
 import { Check } from "lucide-react"
-import { Step } from "@/context/questionnaire-context"
+import { Step } from "@/contexts/questionnaire-context"
 
 interface ProgressIndicatorProps {
   currentStep: Step
