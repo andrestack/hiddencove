@@ -3,6 +3,7 @@ import "./globals.css"
 import { AuthProvider } from "@/contexts/AuthContext"
 import PWAInstallPrompt from "@/components/PWAInstallPrompt"
 import { Viewport } from "next"
+import { Toaster } from "@/components/providers/toaster"
 
 const dmSerifText = DM_Serif_Text({
   weight: ["400"],
@@ -41,7 +42,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#383838" />
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           {children}
           <PWAInstallPrompt />
+          <Toaster />
         </AuthProvider>
         <script
           dangerouslySetInnerHTML={{

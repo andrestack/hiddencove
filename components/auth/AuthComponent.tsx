@@ -9,6 +9,7 @@ import { AuthChangeEvent, Session } from "@supabase/supabase-js"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { toast } from "sonner"
 
 // Form schema for both sign in and sign up
 const signInSchema = z.object({
@@ -37,6 +38,8 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
     handleSubmit,
     formState: { errors },
     reset,
+    setError,
+    clearErrors,
   } = useForm<SignInFormValues | SignUpFormValues>({
     resolver: zodResolver(mode === "signIn" ? signInSchema : signUpSchema),
     mode: "onBlur",
@@ -68,6 +71,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true)
+      clearErrors()
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -81,10 +85,12 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
 
       if (error) {
         console.error("Error signing in with Google:", error.message)
+        toast.error("Failed to sign in with Google")
         throw error
       }
     } catch (error) {
       console.error("Failed to sign in:", error)
+      toast.error("Failed to sign in with Google")
     } finally {
       setIsLoading(false)
     }
@@ -93,6 +99,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
   const onSubmit = async (data: SignInFormValues | SignUpFormValues) => {
     try {
       setIsLoading(true)
+      clearErrors()
 
       if (mode === "signIn") {
         const { data: authData, error } = await supabase.auth.signInWithPassword({
@@ -102,13 +109,27 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
 
         if (error) {
           if (error.message.includes("Email not confirmed")) {
-            throw new Error("Please check your email to confirm your account first.")
+            setError("root.serverError", {
+              type: "manual",
+              message: "Please check your email to confirm your account first.",
+            })
+            toast.error("Please check your email to confirm your account first.")
+            return
+          }
+          if (error.message.includes("Invalid login credentials")) {
+            setError("root.serverError", {
+              type: "manual",
+              message: "Invalid email or password.",
+            })
+            toast.error("Invalid email or password")
+            return
           }
           throw error
         }
 
         // Close modal and redirect on successful sign in
         if (authData.session) {
+          toast.success("Successfully signed in!")
           if (onClose) {
             onClose()
           }
@@ -127,23 +148,47 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
         })
 
         if (error) {
+          if (error.message.includes("User already registered")) {
+            setError("email", {
+              type: "manual",
+              message: "This email is already registered. Please sign in instead.",
+            })
+            setMode("signIn")
+            toast.error("Email already registered")
+            return
+          }
           throw error
         }
 
         // If user exists but no identities, they need to sign in
         if (signUpData?.user && !signUpData?.user?.identities?.length) {
-          throw new Error("An account with this email already exists. Please sign in instead.")
+          setError("email", {
+            type: "manual",
+            message: "This email is already registered. Please sign in instead.",
+          })
+          setMode("signIn")
+          toast.error("Account already exists")
+          return
         }
 
         // Show confirmation message and store pending confirmation
         if (signUpData?.user?.identities?.length) {
           localStorage.setItem("pendingConfirmation", "true")
           localStorage.setItem("userFullName", "name" in data ? data.name : "")
-          throw new Error("Please check your email for a confirmation link.")
+          toast.success("Please check your email for a confirmation link")
+          setError("root.serverError", {
+            type: "success",
+            message: "Please check your email for a confirmation link.",
+          })
         }
       }
     } catch (error) {
-      return error instanceof Error ? error.message : "An error occurred"
+      const message = error instanceof Error ? error.message : "An error occurred"
+      setError("root.serverError", {
+        type: "manual",
+        message,
+      })
+      toast.error(message)
     } finally {
       setIsLoading(false)
     }
@@ -152,7 +197,8 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
   // Reset form when switching modes
   useEffect(() => {
     reset()
-  }, [mode, reset])
+    clearErrors()
+  }, [mode, reset, clearErrors])
 
   return (
     <div className="w-full max-w-md space-y-8">
@@ -167,11 +213,15 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
         </p>
       </div>
 
-      {errors.root?.message && (
-        <div className="rounded-md bg-red-50 p-3 text-center text-sm text-red-600">
-          {errors.root.message}
+      {errors.root?.serverError?.type === "success" ? (
+        <div className="rounded-md bg-green-50 p-3 text-center text-sm text-green-600">
+          {errors.root.serverError.message}
         </div>
-      )}
+      ) : errors.root?.serverError ? (
+        <div className="rounded-md bg-red-50 p-3 text-center text-sm text-red-600">
+          {errors.root.serverError.message}
+        </div>
+      ) : null}
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-2">
         {mode === "signUp" && (
@@ -191,9 +241,14 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
                 className="block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 font-red-hat text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
                 placeholder="Your full name"
                 disabled={isLoading}
+                aria-invalid={errors.name ? "true" : "false"}
               />
             </div>
-            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600" role="alert">
+                {errors.name.message}
+              </p>
+            )}
           </div>
         )}
         <div>
@@ -212,9 +267,14 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
               className="block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 font-red-hat text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
               placeholder="Email address"
               disabled={isLoading}
+              aria-invalid={errors.email ? "true" : "false"}
             />
           </div>
-          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
+          {errors.email && (
+            <p className="mt-1 text-sm text-red-600" role="alert">
+              {errors.email.message}
+            </p>
+          )}
         </div>
 
         <div>
@@ -233,10 +293,13 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
               className="block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 font-red-hat text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
               placeholder="Password"
               disabled={isLoading}
+              aria-invalid={errors.password ? "true" : "false"}
             />
           </div>
           {errors.password && (
-            <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+            <p className="mt-1 text-sm text-red-600" role="alert">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
