@@ -40,7 +40,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
     reset,
     setError,
     clearErrors,
-  } = useForm<SignInFormValues | SignUpFormValues>({
+  } = useForm<SignUpFormValues>({
     resolver: zodResolver(mode === "signIn" ? signInSchema : signUpSchema),
     mode: "onBlur",
   })
@@ -136,13 +136,18 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
           window.location.href = "/questionnaire"
         }
       } else {
+        // Type guard to ensure data has name property
+        if (!("name" in data)) {
+          throw new Error("Name is required for sign up")
+        }
+
         const { data: signUpData, error } = await supabase.auth.signUp({
           email: data.email,
           password: data.password,
           options: {
             emailRedirectTo: getRedirectUrl(),
             data: {
-              full_name: "name" in data ? data.name : "",
+              full_name: data.name,
             },
           },
         })
@@ -153,7 +158,6 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
               type: "manual",
               message: "This email is already registered. Please sign in instead.",
             })
-            setMode("signIn")
             toast.error("Email already registered")
             return
           }
@@ -174,7 +178,7 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
         // Show confirmation message and store pending confirmation
         if (signUpData?.user?.identities?.length) {
           localStorage.setItem("pendingConfirmation", "true")
-          localStorage.setItem("userFullName", "name" in data ? data.name : "")
+          localStorage.setItem("userFullName", data.name)
           toast.success("Please check your email for a confirmation link")
           setError("root.serverError", {
             type: "success",
@@ -241,10 +245,10 @@ export default function AuthComponent({ onClose }: AuthComponentProps) {
                 className="block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 font-red-hat text-gray-900 placeholder:text-gray-400 focus:border-[#E6D4CB] focus:outline-none focus:ring-1 focus:ring-[#E6D4CB]"
                 placeholder="Your full name"
                 disabled={isLoading}
-                aria-invalid={errors.name ? "true" : "false"}
+                aria-invalid={mode === "signUp" && errors.name ? "true" : "false"}
               />
             </div>
-            {errors.name && (
+            {mode === "signUp" && errors.name && (
               <p className="mt-1 text-sm text-red-600" role="alert">
                 {errors.name.message}
               </p>
