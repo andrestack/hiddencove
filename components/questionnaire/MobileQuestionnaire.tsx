@@ -10,7 +10,12 @@ import dynamic from "next/dynamic"
 // Import react-confetti dynamically to avoid SSR issues
 const ReactConfetti = dynamic(() => import("react-confetti"), { ssr: false })
 
-function QuestionnaireContent() {
+// Define props for QuestionnaireContent, including onComplete
+interface QuestionnaireContentProps {
+  onComplete: () => void
+}
+
+function QuestionnaireContent({ onComplete }: QuestionnaireContentProps) {
   const {
     state,
     currentStep,
@@ -46,10 +51,11 @@ function QuestionnaireContent() {
   useEffect(() => {
     if (isQuestionnaireCompleted) {
       setShowConfetti(true)
+      onComplete()
       const timer = setTimeout(() => setShowConfetti(false), 5000)
       return () => clearTimeout(timer)
     }
-  }, [isQuestionnaireCompleted])
+  }, [isQuestionnaireCompleted, onComplete])
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f8f5ee]">
@@ -102,10 +108,16 @@ function QuestionnaireContent() {
   )
 }
 
-export default function MobileQuestionnaire() {
+// Define props for MobileQuestionnaire
+interface MobileQuestionnaireProps {
+  onComplete: () => void
+}
+
+// Accept onComplete prop and pass it down
+export default function MobileQuestionnaire({ onComplete }: MobileQuestionnaireProps) {
   return (
     <QuestionnaireProvider>
-      <QuestionnaireContent />
+      <QuestionnaireContent onComplete={onComplete} />
     </QuestionnaireProvider>
   )
 }

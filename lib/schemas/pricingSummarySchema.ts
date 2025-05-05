@@ -1,6 +1,12 @@
 import { z } from "zod"
 import { prices, type ServiceItem } from "@/lib/prices"
 
+// Define the possible seniority levels explicitly for the enum
+const seniorityLevelsTuple: [string, ...string[]] = [
+  "Baby", // Ensure at least one value exists
+  ...prices.seniorityLevels.filter((level) => level !== "Baby"), // Add the rest dynamically
+]
+
 // Helper function to find a service item by ID across all categories
 const findServiceById = (id: string): ServiceItem | undefined => {
   for (const category of prices.services) {
@@ -15,7 +21,7 @@ const findServiceById = (id: string): ServiceItem | undefined => {
 // Define the schema
 export const pricingSummarySchema = z
   .object({
-    seniorityLevel: z.enum(prices.seniorityLevels, {
+    seniorityLevel: z.enum(seniorityLevelsTuple, {
       required_error: "Please select a stylist level.",
     }),
     downpayment: z.coerce.number().min(0, "Downpayment cannot be negative.").optional().default(0),
