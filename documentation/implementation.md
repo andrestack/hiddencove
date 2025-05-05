@@ -194,11 +194,14 @@
    - Real-time professional insights
 
 5. Implement summary page:
-   - Display a form with dropdowns and multiple choice
-   - 1 input field to add any downpayments
-   - List products available from a products.ts file
-   - Stylists chooses the products necessary based on the conversation
-   - Stylist shows the total cost of the session to the client before continueing
+   - Create a form using React Hook Form.
+   - Include radio buttons for selecting `SeniorityLevel` (Baby, Junior, Intermediate, Senior).
+   - Add an input field for `downpayment`.
+   - For each `ServiceCategory` in `lib/prices.ts`, create a dropdown menu listing the `ServiceItem`s within that category.
+   - Add an input field for `duration` (in hours) specifically for services with `price.type === "hourly"`.
+   - Implement logic to calculate the total cost based on selected services, seniority level, hourly duration (if applicable), and deduct the downpayment.
+   - Display the calculated total cost to the user (stylist).
+   - Use `lib/prices.ts` as the data source for services and pricing.
 
 #### **ChatGPT Integration**
 
