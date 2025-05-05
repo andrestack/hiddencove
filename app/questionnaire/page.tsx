@@ -7,10 +7,15 @@ import { LogOut } from "lucide-react"
 import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
 
-// Dynamically import MobileQuestionnaire to prevent SSR
+// Dynamically import MobileQuestionnaire
 const MobileQuestionnaire = dynamic(
   () => import("@/components/questionnaire/MobileQuestionnaire"),
-  { ssr: false, loading: () => <div>Loading questionnaire...</div> }
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex min-h-[300px] items-center justify-center">Loading questionnaire...</div>
+    ),
+  }
 )
 
 function QuestionnairePageContent() {
@@ -19,14 +24,17 @@ function QuestionnairePageContent() {
   const [isSigningOut, setIsSigningOut] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  console.log(user)
-
   useEffect(() => {
     setMounted(true)
     if (!isLoading && !user) {
       router.replace("/")
     }
   }, [isLoading, user, router])
+
+  const handleQuestionnaireComplete = () => {
+    console.log("Questionnaire completed, navigating to summary...")
+    router.push("/summary")
+  }
 
   if (!mounted || isLoading) {
     return (
@@ -53,9 +61,13 @@ function QuestionnairePageContent() {
   return (
     <main className="container mx-auto flex min-h-screen flex-col px-4 py-8">
       <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="font-dm-serif text-4xl text-[#383838]">Hidden Cove</h1>
-          <h2 className="font-dm-serif text-xl text-[#D7A5A9]">Customer Questionnaire</h2>
+        <div className="w-16"></div>
+
+        <div className="text-center">
+          <h1 className="font-dm-serif text-3xl text-[#383838] md:text-4xl">Hidden Cove</h1>
+          <h2 className="font-dm-serif text-lg text-[#D7A5A9] md:text-xl">
+            Customer Questionnaire
+          </h2>
         </div>
 
         <Button
@@ -65,21 +77,20 @@ function QuestionnairePageContent() {
           className="flex items-center gap-2 border-gray-200 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
         >
           <LogOut className="h-4 w-4" />
-          {isSigningOut ? "Signing out..." : "Sign out"}
+          <span className="hidden sm:inline">{isSigningOut ? "Signing out..." : "Sign out"}</span>
         </Button>
       </div>
 
       <div className="flex-1">
-        <h2 className="py-4 font-red-hat text-xl">
-          Hey {user?.user_metadata?.full_name || "there"}! Welcome back
+        <h2 className="py-4 text-center font-red-hat text-xl sm:text-left">
+          Hey {user?.user_metadata?.full_name?.split(" ")[0] || "there"}! Let&apos;s get started.
         </h2>
-        <MobileQuestionnaire />
+        <MobileQuestionnaire onComplete={handleQuestionnaireComplete} />
       </div>
     </main>
   )
 }
 
-// Wrap in dynamic import to prevent SSR
 export default dynamic(() => Promise.resolve(QuestionnairePageContent), {
   ssr: false,
   loading: () => (
