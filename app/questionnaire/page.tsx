@@ -61,7 +61,7 @@ function QuestionnairePageContent() {
   return (
     <main className="container mx-auto flex min-h-screen flex-col px-4 py-8">
       <div className="mb-8 flex items-center justify-between">
-        <div className="w-16"></div>
+        
 
         <div className="text-left">
           <h1 className="font-dm-serif text-3xl text-[#383838] md:text-4xl">Hidden Cove</h1>

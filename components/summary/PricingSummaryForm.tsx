@@ -425,7 +425,7 @@ export function PricingSummaryForm() {
           <div>
             <Card>
               <CardHeader>
-                <CardTitle>Pricing Summary & Estimate</CardTitle>
+                <CardTitle className="text-xl text-center">Pricing Summary & Estimate</CardTitle>
               </CardHeader>
               <CardContent>
                 <Form {...form}>
