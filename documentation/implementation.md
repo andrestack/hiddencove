@@ -193,11 +193,12 @@
    - Dynamic product suggestions based on context
    - Real-time professional insights
 
-5. Implement product integration:
-   - Display recommended products for each question
-   - Show product usage guidelines
-   - Price information display
-   - Quick product reference system
+5. Implement summary page:
+   - Display a form with dropdowns and multiple choice
+   - 1 input field to add any downpayments
+   - List products available from a products.ts file
+   - Stylists chooses the products necessary based on the conversation
+   - Stylist shows the total cost of the session to the client before continueing
 
 #### **ChatGPT Integration**
 
