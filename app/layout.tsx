@@ -52,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-title" content="Hidden Cove" />
       </head>
       <body
-        className={`${dmSerifText.variable} ${redHatDisplay.variable} min-h-screen bg-background font-red-hat antialiased`}
+        className={`${dmSerifText.variable} ${redHatDisplay.variable} min-h-screen font-red-hat antialiased`}
       >
         <AuthProvider>
           {children}
