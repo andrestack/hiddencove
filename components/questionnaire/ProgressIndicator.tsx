@@ -31,7 +31,7 @@ export default function ProgressIndicator({
           </div>
         </div>
         <div className="text-sm text-[#6b5d4d]">
-          {currentStepIndex + 1} of {totalSteps}
+          {currentStepIndex + 1} / {totalSteps}
         </div>
       </div>
 

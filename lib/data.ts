@@ -65,7 +65,7 @@ export const knowledgeBase = {
     {
       id: "assessment",
       name: "Assessment",
-      description: "Initial assessment of client needs and expectations",
+      description: "Needs and expectations",
       questions: [
         {
           id: "current_dislikes",
@@ -165,7 +165,7 @@ export const knowledgeBase = {
     {
       id: "consultation_background",
       name: "Background",
-      description: "Understanding client history and requirements",
+      description: "Understanding history and requirements",
       questions: [
         {
           id: "new_stylist_reason",
@@ -196,7 +196,7 @@ export const knowledgeBase = {
     {
       id: "maintenance_assessment",
       name: "Maintenance",
-      description: "Understanding client's maintenance capabilities and preferences",
+      description: "Understanding maintenance and preferences",
       questions: [
         {
           id: "current_routine",
@@ -251,7 +251,7 @@ export const knowledgeBase = {
     {
       id: "face_frame",
       name: "Face Frame",
-      description: "Assessment of face-framing elements",
+      description: "Face-framing elements",
       questions: [
         {
           id: "blonde_boldness",
@@ -288,7 +288,7 @@ export const knowledgeBase = {
     {
       id: "mids",
       name: "Mids",
-      description: "Mid-length assessment and planning",
+      description: "Assessment and planning",
       questions: [
         {
           id: "mid_dimension",
@@ -306,7 +306,7 @@ export const knowledgeBase = {
     {
       id: "ends",
       name: "Ends",
-      description: "End assessment and treatment planning",
+      description:"Assessment and treatment planning",
       questions: [
         {
           id: "ends_condition",
@@ -319,7 +319,7 @@ export const knowledgeBase = {
     {
       id: "nape",
       name: "Nape",
-      description: "Nape area assessment and planning",
+      description: "Assessment and planning",
       questions: [
         {
           id: "nape_preference",
