@@ -1,4 +1,4 @@
-// lib/api/getInsight.ts
+
 export async function getInsight(question: string, context: string): Promise<string> {
     const res = await fetch('/api/insights', {
       method: 'POST',

@@ -1,7 +1,9 @@
 "use client"
 
-import { Info, X } from "lucide-react"
+import { Info, X, Loader2 } from "lucide-react"
 import { Question } from "@/contexts/questionnaire-context"
+import { getInsight } from "@/lib/api/getInsights"
+import { useState, useEffect } from "react"
 
 interface QuestionCardProps {
   question: Question
@@ -10,6 +12,31 @@ interface QuestionCardProps {
 }
 
 export default function QuestionCard({ question, isExpanded, onToggleTooltip }: QuestionCardProps) {
+  const [insight, setInsight] = useState<string>("")
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    async function fetchInsight() {
+      if (isExpanded && !insight) {
+        setIsLoading(true)
+        try {
+          const generatedInsight = await getInsight(
+            question.text,
+            "Provide a helpful insight about this question"
+          )
+          setInsight(generatedInsight)
+        } catch (error) {
+          console.error("Failed to fetch insight:", error)
+          setInsight("Unable to generate insight at this time.")
+        } finally {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    fetchInsight()
+  }, [isExpanded, question.text, insight])
+
   return (
     <div className="mb-6">
       <div className="overflow-hidden rounded-lg border border-[#e6dfd0] bg-white shadow-sm">
@@ -35,7 +62,16 @@ export default function QuestionCard({ question, isExpanded, onToggleTooltip }: 
             >
               <X size={16} />
             </button>
-            <p className="pr-4 text-sm text-[#5c4c3a]">{question.tooltip}</p>
+            <div className="pr-4 text-sm text-[#5c4c3a]">
+              {isLoading ? (
+                <p className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Generating insight...</span>
+                </p>
+              ) : (
+                <p className="pr-4 text-sm text-[#5c4c3a]">{insight}</p>
+              )}
+            </div>
           </div>
         )}
       </div>
