@@ -137,49 +137,45 @@ export function PricingSummaryForm() {
   // --- Calculation Effect ---
   useEffect(() => {
     const subscription = watch((currentValues) => {
-      if (formState.isValid) {
-        setIsCalculating(true)
-        let currentTotal = 0
-        const data = currentValues as PricingSummaryFormValues
+      setIsCalculating(true)
+      let currentTotal = 0
+      const data = currentValues as PricingSummaryFormValues
 
-        // Calculate Main Services
-        prices.services.forEach((category) => {
-          const fieldName = getFieldNameForCategory(category.category) as FieldName
-          if (fieldName === "addOns") return
+      // Calculate Main Services
+      prices.services.forEach((category) => {
+        const fieldName = getFieldNameForCategory(category.category) as FieldName
+        if (fieldName === "addOns") return
 
-          const selectedItemId = data[fieldName] as string | undefined
-          if (selectedItemId && data.seniorityLevel) {
-            const item = findServiceById(selectedItemId)
-            if (item) {
-              currentTotal += calculateItemCost(item, data.seniorityLevel, data.hourlyDuration)
-            }
+        const selectedItemId = data[fieldName] as string | undefined
+        if (selectedItemId && data.seniorityLevel) {
+          const item = findServiceById(selectedItemId)
+          if (item) {
+            currentTotal += calculateItemCost(item, data.seniorityLevel, data.hourlyDuration)
+          }
+        }
+      })
+
+      // Calculate Add-Ons
+      const addOnCategory = prices.services.find(
+        (c) => getFieldNameForCategory(c.category) === "addOns"
+      )
+      if (addOnCategory && data.addOns && data.seniorityLevel) {
+        data.addOns.forEach((addOnId) => {
+          const addOnItem = addOnCategory.items.find((i) => i.id === addOnId)
+          if (addOnItem) {
+            currentTotal += calculateItemCost(addOnItem, data.seniorityLevel)
           }
         })
-
-        // Calculate Add-Ons
-        const addOnCategory = prices.services.find(
-          (c) => getFieldNameForCategory(c.category) === "addOns"
-        )
-        if (addOnCategory && data.addOns && data.seniorityLevel) {
-          data.addOns.forEach((addOnId) => {
-            const addOnItem = addOnCategory.items.find((i) => i.id === addOnId)
-            if (addOnItem) {
-              currentTotal += calculateItemCost(addOnItem, data.seniorityLevel)
-            }
-          })
-        }
-
-        // Subtract Downpayment
-        currentTotal -= data.downpayment || 0
-        setTotalCost(Math.max(0, currentTotal))
-        setIsCalculating(false)
-      } else {
-        setTotalCost(0)
       }
+
+      // Subtract Downpayment
+      currentTotal -= data.downpayment || 0
+      setTotalCost(Math.max(0, currentTotal))
+      setIsCalculating(false)
     })
 
     return () => subscription.unsubscribe()
-  }, [watch, formState.isValid, formState.errors])
+  }, [watch])
 
   // --- Submit Handler ---
   const onSubmit = (data: PricingSummaryFormValues) => {
@@ -425,7 +421,7 @@ export function PricingSummaryForm() {
           <div>
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl text-center">Pricing Summary & Estimate</CardTitle>
+                <CardTitle className="text-center text-xl">Pricing Summary & Estimate</CardTitle>
               </CardHeader>
               <CardContent>
                 <Form {...form}>
