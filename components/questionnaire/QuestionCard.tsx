@@ -74,7 +74,9 @@ export default function QuestionCard({ question, isExpanded, onToggleTooltip }: 
               ) : (
                 <>
                   <p className="pr-4 text-sm text-[#5c4c3a]">{insight}</p>
-                  {followUp && <p className="mt-2 font-bold text-md text-[#7a6a58]">Try asking: {followUp}</p>}
+                  {followUp && (
+                    <p className="text-md mt-2 font-bold text-[#7a6a58]">Try asking: {followUp}</p>
+                  )}
                 </>
               )}
             </div>
