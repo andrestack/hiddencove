@@ -130,7 +130,8 @@ export const prices: PricingData = {
           price: { base: 25, type: "fixed" },
           notes: null,
         },
-        { id: "addon_tip_out", name: "Tip out", price: { base: 55, type: "from" }, notes: null },
+        { id: "addon_tip_out", name: "Full Tip out", price: { base: 80, type: "from" }, notes: null },
+        { id: "addon_half_tip_out", name: "Half Tip out", price: { base: 55, type: "from" }, notes: null },
         {
           id: "addon_basin_bally",
           name: "Basin bally",
