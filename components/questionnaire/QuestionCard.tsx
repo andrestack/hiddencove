@@ -13,6 +13,7 @@ interface QuestionCardProps {
 
 export default function QuestionCard({ question, isExpanded, onToggleTooltip }: QuestionCardProps) {
   const [insight, setInsight] = useState<string>("")
+  const [followUp, setFollowUp] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
@@ -20,14 +21,16 @@ export default function QuestionCard({ question, isExpanded, onToggleTooltip }: 
       if (isExpanded && !insight) {
         setIsLoading(true)
         try {
-          const generatedInsight = await getInsight(
+          const generated = await getInsight(
             question.text,
             "Provide a helpful insight about this question"
           )
-          setInsight(generatedInsight)
+          setInsight(generated.insight)
+          setFollowUp(generated.follow_up)
         } catch (error) {
           console.error("Failed to fetch insight:", error)
           setInsight("Unable to generate insight at this time.")
+          setFollowUp("")
         } finally {
           setIsLoading(false)
         }
@@ -69,7 +72,10 @@ export default function QuestionCard({ question, isExpanded, onToggleTooltip }: 
                   <span>Generating insight...</span>
                 </p>
               ) : (
-                <p className="pr-4 text-sm text-[#5c4c3a]">{insight}</p>
+                <>
+                  <p className="pr-4 text-sm text-[#5c4c3a]">{insight}</p>
+                  {followUp && <p className="mt-2 font-bold text-md text-[#7a6a58]">Try asking: {followUp}</p>}
+                </>
               )}
             </div>
           </div>
