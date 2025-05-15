@@ -45,7 +45,7 @@ export function EstimateDetails({ formValues, totalCost, isCalculating }: Estima
     addOnCategory?.items.filter((item) => formValues.addOns?.includes(item.id)) || []
 
   return (
-    <Card className="h-full">
+    <Card className="h-[70vh]">
       <CardHeader>
         <CardTitle>Estimate Details</CardTitle>
       </CardHeader>

@@ -28,9 +28,9 @@ export function EstimateModal({
 }: EstimateModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
+      <DialogContent className="max-h-[100vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Estimate Details</DialogTitle>
+          <DialogTitle></DialogTitle>
         </DialogHeader>
         <div className="space-y-6">
           <EstimateDetails
@@ -38,7 +38,7 @@ export function EstimateModal({
             totalCost={totalCost}
             isCalculating={isCalculating}
           />
-          <Button onClick={onConfirm} className="w-full" disabled={isCalculating}>
+          <Button onClick={onConfirm} className="w-full bg-[#E6D4CB]" disabled={isCalculating}>
             Confirm Estimate & Proceed
           </Button>
         </div>
