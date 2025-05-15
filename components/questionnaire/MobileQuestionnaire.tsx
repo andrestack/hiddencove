@@ -81,7 +81,7 @@ function QuestionnaireContent({ onComplete }: QuestionnaireContentProps) {
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         {currentStep.questions.map((question) => (
           <QuestionCard
-            key={question.id}
+            key={`${currentStep.id}-${question.id}`}
             question={question}
             isExpanded={isTooltipExpanded(question.id)}
             onToggleTooltip={() => toggleTooltip(question.id)}
