@@ -66,7 +66,7 @@ export default function LandingPage() {
             onClick={() => setShowAuth(true)}
             className="group rounded-full bg-[#383838] px-8 py-6 font-red-hat text-lg text-white hover:bg-[#D7A5A9]"
           >
-            Begin Questionnaire
+            Login to Begin
             <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Button>
         </div>
