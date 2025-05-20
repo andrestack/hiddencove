@@ -38,7 +38,7 @@ export function EstimateModal({
             totalCost={totalCost}
             isCalculating={isCalculating}
           />
-          <Button onClick={onConfirm} className="w-full text-[#383838] bg-[#E6D4CB]" disabled={isCalculating}>
+          <Button onClick={onConfirm} className="w-full hover:bg-[#E6D4CB] hover:text-[#383838]" disabled={isCalculating}>
             Confirm Estimate & Proceed
           </Button>
         </div>
