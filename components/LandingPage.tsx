@@ -49,7 +49,7 @@ export default function LandingPage() {
         }}
       >
         <div className="absolute bottom-8 left-8 right-8">
-          <h1 className="font-dm-serif text-4xl text-[#383838] md:text-5xl">Hidden Cove</h1>
+          <h1 className="font-dm-serif text-4xl text-[#383838] md:text-5xl">Trust the Junior</h1>
           <h2 className="font-dm-serif text-3xl text-[#D7A5A9] md:text-4xl">Customer Onboarding</h2>
         </div>
       </div>
